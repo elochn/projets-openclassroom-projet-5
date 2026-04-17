@@ -1,0 +1,23 @@
+[project]
+name = "employee-turnover-ml"
+version = "0.1.0"
+description = "Analyse et prédiction du départ des employés"
+authors = [
+    {name = "Elodie Chen"}
+]
+requires-python = ">=3.10,<3.13"
+
+dependencies = [
+    "pandas",
+    "numpy",
+    "scikit-learn",
+    "imbalanced-learn",
+    "lightgbm",
+    "matplotlib",
+    "seaborn",
+    "jupyter",
+    "ipykernel",
+    "ipywidgets",
+    "ydata-profiling",
+    "shap"
+]
