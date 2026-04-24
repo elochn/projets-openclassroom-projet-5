@@ -1,0 +1,27 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: ["main", "feature/notebook", "feature/tests"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v3
+
+      - name: Installer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Installer les dépendances
+        run: pip install -r requirements.txt
+
+      - name: Vérifier que les fichiers existent
+        run: |
+          ls -la
+          echo "Pipeline CI OK ✅"
