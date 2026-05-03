@@ -1,3 +1,2 @@
-.DS_Store
-*.joblib
 *.pkl
+.DS_Store
