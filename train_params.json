@@ -1,0 +1,12 @@
+import json
+
+# Sauvegarde des paramètres calculés sur X_train
+params = {
+    "median_salary_by_level": X_train.groupby("niveau_hierarchique_poste")["revenu_mensuel"].median().to_dict(),
+    "distance_threshold": float(X_train["distance_domicile_travail"].quantile(0.75))
+}
+
+with open("train_params.json", "w") as f:
+    json.dump(params, f)
+
+print("Paramètres sauvegardés ✅")
