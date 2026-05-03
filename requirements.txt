@@ -1,0 +1,13 @@
+pandas
+numpy
+scikit-learn
+imbalanced-learn
+lightgbm
+matplotlib
+seaborn
+jupyter
+ipykernel
+ipywidgets
+ydata-profiling
+shap
+pytest
