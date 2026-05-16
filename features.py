@@ -127,3 +127,23 @@ def feature_engineering(df, median_salary_by_level, distance_threshold):
     df = create_mobilite_forte(df)
 
     return df
+
+def Feature_Engineering(df):
+    df = df.copy()
+    for col in df.columns:
+        current_dtype = df[col].dtype
+        n_unique = df[col].nunique(dropna=False)
+
+        if (
+            n_unique in [1, 2]
+            and set(df[col].dropna().unique()).issubset({0, 1})
+            and col != "note_evaluation_actuelle"
+        ):
+            df[col] = df[col].astype("bool")
+        elif current_dtype in ["int64", "float64"] and n_unique < 15:
+            df[col] = df[col].astype("int64")
+        elif current_dtype in ["int64", "float64"]:
+            df[col] = df[col].astype("float64")
+        else:
+            df[col] = df[col].astype("category")
+    return df
