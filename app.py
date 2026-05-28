@@ -4,6 +4,8 @@ from joblib import load
 import pandas as pd
 import json
 from features import feature_engineering
+from sqlalchemy.orm import Session
+from create_db import engine, PredictionLog
 
 # Chargement du modèle et des paramètres
 pipeline = load("model_pipeline.joblib")
@@ -55,7 +57,7 @@ def root():
 @app.post("/predict")
 def predict(data: EmployeeData):
     # 1. Conversion en DataFrame
-    df = pd.DataFrame([data.model_dump()])
+    df = pd.DataFrame([data.model_dump()]) # transformation de l'objet EmployeeData reçu par l'API en dictionnaire Python (27 champs input)
 
     # 2. Feature engineering (crée toutes les colonnes dérivées)
     df = feature_engineering(df, median_salary_by_level, distance_threshold)
@@ -72,6 +74,17 @@ def predict(data: EmployeeData):
     # 5. Prédiction
     prediction = int(pipeline.predict(df)[0])
     probabilite = float(pipeline.predict_proba(df)[0][1])
+
+    with Session(engine) as session:
+          log = PredictionLog(
+              **data.model_dump(), # dictionnaire python "déplié" pour passer chaque champ comme argument séparé à PredictionLog(...)
+              prediction=prediction,
+              probabilite_churn=probabilite,
+              interpretation="Risque de churn" if prediction == 1
+              else "Pas de risque de churn"
+          )
+          session.add(log)
+          session.commit()
 
     return {
         "prediction": prediction,
