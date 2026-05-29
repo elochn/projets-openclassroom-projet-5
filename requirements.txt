@@ -11,3 +11,5 @@ ipywidgets
 ydata-profiling
 shap
 pytest
+sqlalchemy
+psycopg

@@ -17,6 +17,7 @@ sample = pd.DataFrame([{
     "satisfaction_employee_equilibre_pro_perso": 3,
     "annees_dans_l_entreprise": 5,
     "annees_dans_le_poste_actuel": 2,
+    "blocage_promotion": 0,
     "annees_depuis_la_derniere_promotion": 1,
     "annes_sous_responsable_actuel": 2,
     "nb_formations_suivies": 2,
