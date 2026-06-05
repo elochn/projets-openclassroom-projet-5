@@ -5,7 +5,12 @@ import pandas as pd
 import json
 from features import feature_engineering
 from sqlalchemy.orm import Session
-from create_db import engine, PredictionLog
+
+try: 
+    from create_db import engine, PredictionLog
+    DB_AVAILABLE = True
+except Exception:
+    DB_AVAILABLE = False
 
 # Chargement du modèle et des paramètres
 pipeline = load("model_pipeline.joblib")
@@ -75,16 +80,17 @@ def predict(data: EmployeeData):
     prediction = int(pipeline.predict(df)[0])
     probabilite = float(pipeline.predict_proba(df)[0][1])
 
-    with Session(engine) as session:
-          log = PredictionLog(
-              **data.model_dump(), # dictionnaire python "déplié" pour passer chaque champ comme argument séparé à PredictionLog(...)
-              prediction=prediction,
-              probabilite_churn=probabilite,
-              interpretation="Risque de churn" if prediction == 1
-              else "Pas de risque de churn"
-          )
-          session.add(log)
-          session.commit()
+    if DB_AVAILABLE:
+        with Session(engine) as session:
+            log = PredictionLog(
+                **data.model_dump(), # dictionnaire python "déplié" pour passer chaque champ comme argument séparé à PredictionLog(...)
+                prediction=prediction,
+                probabilite_churn=probabilite,
+                interpretation="Risque de churn" if prediction == 1
+                else "Pas de risque de churn"
+            )
+            session.add(log)
+            session.commit()
 
     return {
         "prediction": prediction,
