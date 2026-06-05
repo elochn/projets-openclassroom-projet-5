@@ -32,7 +32,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/test_model.py
+          pytest tests/
         env:
           ENV: test
 

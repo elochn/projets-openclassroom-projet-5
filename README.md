@@ -1,3 +1,12 @@
+---
+title: Projet5 Churn Prediction
+emoji: 🏢
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
+
 # API de prédiction du turnover employé
 
 Ce projet met en production un modèle de machine learning (LightGBM) qui prédit le risque de départ volontaire d'un employé. Il expose une API REST, journalise chaque prédiction dans une base de données PostgreSQL, et est déployé automatiquement sur Hugging Face Spaces.
