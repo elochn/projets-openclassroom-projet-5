@@ -225,3 +225,4 @@ Dans les secrets du Space Hugging Face (`Settings > Variables and secrets`) :
 ### URL de l'application déployée
 
 `https://huggingface.co/spaces/elch99/projet5`
+Documentation interactive (Swagger) : `https://elch99-projet5.hf.space/docs`
