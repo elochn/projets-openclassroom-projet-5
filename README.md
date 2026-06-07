@@ -134,6 +134,10 @@ Réponse :
 
 ## Base de données
 
+### Schéma UML
+
+![Schéma de la base de données](docs/schema_bdd.png)
+
 ### Schéma
 
 Le script `create_db.py` crée deux tables dans PostgreSQL :
