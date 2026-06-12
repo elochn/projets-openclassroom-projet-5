@@ -80,6 +80,7 @@ def predict(data: EmployeeData):
     prediction = int(pipeline.predict(df)[0])
     probabilite = float(pipeline.predict_proba(df)[0][1])
 
+
     if DB_AVAILABLE:
         with Session(engine) as session:
             log = PredictionLog(
