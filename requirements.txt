@@ -13,3 +13,5 @@ shap
 pytest
 sqlalchemy
 psycopg
+fastapi
+uvicorn

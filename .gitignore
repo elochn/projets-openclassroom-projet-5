@@ -1,5 +1,7 @@
 *.pkl
 .DS_Store
-*.joblib
 *.pyc 
 __pycache__/
+.coverage
+.venv/
+htmlcov/
