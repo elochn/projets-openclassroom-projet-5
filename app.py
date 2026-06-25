@@ -1,10 +1,21 @@
-from fastapi import FastAPI
+import os
+from fastapi import FastAPI, Security, HTTPException
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel
+from typing import Literal
 from joblib import load
 import pandas as pd
 import json
 from features import feature_engineering
 from sqlalchemy.orm import Session
+
+API_KEY = os.getenv("API_KEY", "dev-key-local")
+api_key_header = APIKeyHeader(name="X-API-Key")
+
+def verify_api_key(key: str = Security(api_key_header)):
+    if key != API_KEY:
+        raise HTTPException(status_code=403, detail="Clé API invalide")
+
 
 try: 
     from create_db import engine, PredictionLog
@@ -24,15 +35,20 @@ distance_threshold = params["distance_threshold"]
 app = FastAPI(title="Churn Prediction API")
 
 class EmployeeData(BaseModel):
-    # Catégorielles
-    genre: str
-    statut_marital: str
-    departement: str
-    poste: str
-    domaine_etude: str
-    frequence_deplacement: str
-    augementation_salaire_precedente: str  # ex: "15 %"
-    heure_supplementaires: str             # "Oui" ou "Non"
+    # Catégorielles — valeurs exactes acceptées par le modèle
+    genre: Literal["F", "M"]
+    statut_marital: Literal["Célibataire", "Divorcé(e)", "Marié(e)"]
+    departement: Literal["Commercial", "Consulting", "Ressources Humaines"]
+    poste: Literal["Assistant de Direction", "Cadre Commercial", "Consultant",
+                   "Directeur Technique", "Manager", "Représentant Commercial",
+                   "Ressources Humaines", "Senior Manager", "Tech Lead"]
+    domaine_etude: Literal["Autre", "Entrepreunariat", "Infra & Cloud",
+                           "Marketing", "Ressources Humaines", "Transformation Digitale"]
+    frequence_deplacement: Literal["Aucun", "Frequent", "Occasionnel"]
+    augementation_salaire_precedente: Literal["11 %", "12 %", "13 %", "14 %", "15 %",
+                                              "16 %", "17 %", "18 %", "19 %", "20 %",
+                                              "21 %", "22 %", "23 %", "24 %", "25 %"]
+    heure_supplementaires: Literal["Oui", "Non"]
     # Entiers
     revenu_mensuel: int
     satisfaction_employee_environnement: int
@@ -55,12 +71,49 @@ class EmployeeData(BaseModel):
     annee_experience_totale: float
     distance_domicile_travail: float
 
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "description": "Profil à risque élevé de churn",
+                    "genre": "M",
+                    "statut_marital": "Célibataire",
+                    "departement": "Commercial",
+                    "poste": "Représentant Commercial",
+                    "domaine_etude": "Marketing",
+                    "frequence_deplacement": "Frequent",
+                    "augementation_salaire_precedente": "11 %",
+                    "heure_supplementaires": "Oui",
+                    "revenu_mensuel": 2500,
+                    "satisfaction_employee_environnement": 1,
+                    "satisfaction_employee_nature_travail": 1,
+                    "satisfaction_employee_equipe": 2,
+                    "satisfaction_employee_equilibre_pro_perso": 1,
+                    "note_evaluation_precedente": 3,
+                    "note_evaluation_actuelle": 4,
+                    "niveau_hierarchique_poste": 1,
+                    "niveau_education": 2,
+                    "nb_formations_suivies": 2,
+                    "nombre_participation_pee": 0,
+                    "nombre_experiences_precedentes": 5,
+                    "annees_dans_l_entreprise": 2,
+                    "annees_dans_le_poste_actuel": 1,
+                    "annees_depuis_la_derniere_promotion": 1,
+                    "annes_sous_responsable_actuel": 1,
+                    "age": 28.0,
+                    "annee_experience_totale": 6.0,
+                    "distance_domicile_travail": 25.0
+                }
+            ]
+        }
+    }
+
 @app.get("/")
 def root():
     return {"message": "API opérationnelle ✅"}
 
 @app.post("/predict")
-def predict(data: EmployeeData):
+def predict(data: EmployeeData, _ = Security(verify_api_key)):
     # 1. Conversion en DataFrame
     df = pd.DataFrame([data.model_dump()]) # transformation de l'objet EmployeeData reçu par l'API en dictionnaire Python (27 champs input)
 
@@ -98,3 +151,4 @@ def predict(data: EmployeeData):
         "probabilite_churn": round(probabilite, 3),
         "interpretation": "Risque de churn" if prediction == 1 else "Pas de risque de churn"
     }
+
