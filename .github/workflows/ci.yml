@@ -35,8 +35,7 @@ jobs:
           pytest tests/
         env:
           ENV: test
-
-
+  
   deploy:
     needs: test
     runs-on: ubuntu-latest
@@ -60,6 +59,8 @@ jobs:
           rsync -av \
             --exclude='.git' \
             --exclude='hf-space' \
+            --exclude='docs/' \
+            --exclude='screenshots/' \
             ./ hf-space/
 
 
