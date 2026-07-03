@@ -20,7 +20,8 @@ def verify_api_key(key: str = Security(api_key_header)):
 try: 
     from create_db import engine, PredictionLog
     DB_AVAILABLE = True
-except Exception:
+except Exception as e:
+    print(f"Database non disponible: {e}")
     DB_AVAILABLE = False
 
 # Chargement du modèle et des paramètres
