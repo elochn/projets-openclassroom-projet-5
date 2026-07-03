@@ -12,6 +12,6 @@ ydata-profiling
 shap
 pytest
 sqlalchemy
-psycopg
+psycopg[binary]
 fastapi
 uvicorn
