@@ -90,10 +90,10 @@ Exemple de corps de requête JSON :
 
 ```json
 {
-  "genre": "Homme",
+  "genre": "M",
   "statut_marital": "Célibataire",
-  "departement": "Ventes",
-  "poste": "Représentant commercial",
+  "departement": "Commercial",
+  "poste": "Représentant Commercial",
   "domaine_etude": "Marketing",
   "frequence_deplacement": "Frequent",
   "augementation_salaire_precedente": "11 %",
@@ -159,8 +159,10 @@ La base de données est configurée via une variable d'environnement :
 export DATABASE_URL=postgresql://localhost/churn_db
 ```
 
-La valeur par défaut (développement local) est `postgresql://localhost/churn_db`.  
+La valeur par défaut (*développement local*) est `postgresql://localhost/churn_db`. 
 En production sur Hugging Face Spaces, `DATABASE_URL` est stockée comme secret dans les paramètres du Space.
+
+Une *base de données de production* est également hébergée sur **Supabase** (PostgreSQL cloud). La connexion se fait via un *'Connection pooler'* pour compatibilité réseau. Le réseau Hugging Face ne supporte que IPv4, et Supabase propose justement une URL de connexion spéciale via un connection pooler qui fonctionne en IPv4. 
 
 ### Vérifier les données
 
@@ -179,6 +181,7 @@ psql churn_db -c "SELECT id, created_at, prediction, probabilite_churn FROM pred
 - **Aucun secret hardcodé** : `DATABASE_URL` est toujours lue depuis les variables d'environnement, jamais écrite en dur dans le code.
 - **Secrets en production** : le token Hugging Face (`HF_TOKEN`) et `DATABASE_URL` sont stockés comme secrets chiffrés dans les paramètres du Space Hugging Face — ils ne sont jamais exposés dans le code ni dans les logs.
 - **Variables sensibles hors dépôt** : `.env`, `.venv/`, `.coverage`, `htmlcov/` sont listés dans `.gitignore` et ne sont jamais commités.
+- **Authentification de l'API** : l'endpoint /predict est protégé par une clé API transmise dans le header X-API-Key. Sans cette clé, l'API retourne une erreur 401. La clé est lue depuis la variable d'environnement API_KEY.
 
 ---
 
@@ -225,6 +228,7 @@ Dans les secrets du Space Hugging Face (`Settings > Variables and secrets`) :
 | Secret | Valeur |
 |---|---|
 | `DATABASE_URL` | URL de connexion PostgreSQL en production |
+| `API_KEY`| Clé d'authentification de l'API |
 
 ### URL de l'application déployée
 

@@ -5,3 +5,5 @@ __pycache__/
 .coverage
 .venv/
 htmlcov/
+screenshots/
+presentation.html
