@@ -162,8 +162,8 @@ def predict(data: EmployeeData, _ = Security(verify_api_key)):
     df = Feature_Engineering(df)
 
     # 5. Prédiction
-    prediction = int(pipeline.predict(df)[0])
     probabilite = float(pipeline.predict_proba(df)[0][1])
+    prediction = int(probabilite >= 0.48)
 
 
     if DB_AVAILABLE:
