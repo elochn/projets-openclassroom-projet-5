@@ -61,7 +61,7 @@ class EmployeeData(BaseModel):
     niveau_hierarchique_poste: int
     niveau_education: int
     nb_formations_suivies: int
-    nombre_participation_pee: int
+    nombre_participation_pee: int = 0
     nombre_experiences_precedentes: int
     annees_dans_l_entreprise: int
     annees_dans_le_poste_actuel: int
@@ -72,52 +72,78 @@ class EmployeeData(BaseModel):
     annee_experience_totale: float
     distance_domicile_travail: float
 
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "description": "Profil à risque élevé de churn",
-                    "genre": "M",
-                    "statut_marital": "Célibataire",
-                    "departement": "Commercial",
-                    "poste": "Représentant Commercial",
-                    "domaine_etude": "Marketing",
-                    "frequence_deplacement": "Frequent",
-                    "augementation_salaire_precedente": "11 %",
-                    "heure_supplementaires": "Oui",
-                    "revenu_mensuel": 2500,
-                    "satisfaction_employee_environnement": 1,
-                    "satisfaction_employee_nature_travail": 1,
-                    "satisfaction_employee_equipe": 2,
-                    "satisfaction_employee_equilibre_pro_perso": 1,
-                    "note_evaluation_precedente": 3,
-                    "note_evaluation_actuelle": 4,
-                    "niveau_hierarchique_poste": 1,
-                    "niveau_education": 2,
-                    "nb_formations_suivies": 2,
-                    "nombre_participation_pee": 0,
-                    "nombre_experiences_precedentes": 5,
-                    "annees_dans_l_entreprise": 2,
-                    "annees_dans_le_poste_actuel": 1,
-                    "annees_depuis_la_derniere_promotion": 1,
-                    "annes_sous_responsable_actuel": 1,
-                    "age": 28.0,
-                    "annee_experience_totale": 6.0,
-                    "distance_domicile_travail": 25.0
-                }
-            ]
-        }
-    }
-
 @app.get("/")
 def root():
     return {"message": "API opérationnelle ✅"}
 
-@app.post("/predict", responses={
-    401: {"description": "Not authenticated", "content": {"application/json": {"example": {"detail": "Not authenticated"}}}},
-    403: {"description": "Clé API invalide", "content": {"application/json": {"example": {"detail": "Clé API invalide"}}}},
-    500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": "Internal Server Error"}}}},
-})
+@app.post("/predict",
+    responses={
+        401: {"description": "Not authenticated", "content": {"application/json": {"example": {"detail": "Not authenticated"}}}},
+        403: {"description": "Clé API invalide", "content": {"application/json": {"example": {"detail": "Clé API invalide"}}}},
+        500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": "Internal Server Error"}}}},
+    },
+    openapi_extra={
+        "requestBody": {
+            "content": {
+                "application/json": {
+                    "examples": {
+                        "Risque élevé": {
+                            "summary": "Profil 1 — Jeune commercial surchargé, mal payé",
+                            "value": {
+                                "genre": "M", "statut_marital": "Célibataire", "departement": "Commercial",
+                                "poste": "Représentant Commercial", "domaine_etude": "Marketing",
+                                "frequence_deplacement": "Frequent", "augementation_salaire_precedente": "11 %",
+                                "heure_supplementaires": "Oui", "revenu_mensuel": 1200,
+                                "satisfaction_employee_environnement": 1, "satisfaction_employee_nature_travail": 1,
+                                "satisfaction_employee_equipe": 2, "satisfaction_employee_equilibre_pro_perso": 1,
+                                "note_evaluation_precedente": 3, "note_evaluation_actuelle": 3,
+                                "niveau_hierarchique_poste": 1, "niveau_education": 2, "nb_formations_suivies": 1,
+                                "nombre_participation_pee": 0, "nombre_experiences_precedentes": 6,
+                                "annees_dans_l_entreprise": 2, "annees_dans_le_poste_actuel": 1,
+                                "annees_depuis_la_derniere_promotion": 2, "annes_sous_responsable_actuel": 1,
+                                "age": 26.0, "annee_experience_totale": 4.0, "distance_domicile_travail": 25.0
+                            }
+                        },
+                        "Risque faible": {
+                            "summary": "Profil 2 — Manager senior épanoui",
+                            "value": {
+                                "genre": "F", "statut_marital": "Marié(e)", "departement": "Consulting",
+                                "poste": "Senior Manager", "domaine_etude": "Transformation Digitale",
+                                "frequence_deplacement": "Aucun", "augementation_salaire_precedente": "20 %",
+                                "heure_supplementaires": "Non", "revenu_mensuel": 15000,
+                                "satisfaction_employee_environnement": 4, "satisfaction_employee_nature_travail": 4,
+                                "satisfaction_employee_equipe": 4, "satisfaction_employee_equilibre_pro_perso": 4,
+                                "note_evaluation_precedente": 4, "note_evaluation_actuelle": 4,
+                                "niveau_hierarchique_poste": 4, "niveau_education": 4, "nb_formations_suivies": 3,
+                                "nombre_participation_pee": 3, "nombre_experiences_precedentes": 2,
+                                "annees_dans_l_entreprise": 15, "annees_dans_le_poste_actuel": 6,
+                                "annees_depuis_la_derniere_promotion": 2, "annes_sous_responsable_actuel": 8,
+                                "age": 42.0, "annee_experience_totale": 20.0, "distance_domicile_travail": 5.0
+                            }
+                        },
+                        "Risque moyen": {
+                            "summary": "Profil 3 — Consultant mid-level, quelques signaux",
+                            "value": {
+                                "genre": "M", "statut_marital": "Divorcé(e)", "departement": "Consulting",
+                                "poste": "Consultant", "domaine_etude": "Infra & Cloud",
+                                "frequence_deplacement": "Occasionnel", "augementation_salaire_precedente": "14 %",
+                                "heure_supplementaires": "Oui", "revenu_mensuel": 5000,
+                                "satisfaction_employee_environnement": 2, "satisfaction_employee_nature_travail": 3,
+                                "satisfaction_employee_equipe": 3, "satisfaction_employee_equilibre_pro_perso": 2,
+                                "note_evaluation_precedente": 3, "note_evaluation_actuelle": 3,
+                                "niveau_hierarchique_poste": 2, "niveau_education": 3, "nb_formations_suivies": 2,
+                                "nombre_participation_pee": 1, "nombre_experiences_precedentes": 4,
+                                "annees_dans_l_entreprise": 5, "annees_dans_le_poste_actuel": 3,
+                                "annees_depuis_la_derniere_promotion": 4, "annes_sous_responsable_actuel": 3,
+                                "age": 34.0, "annee_experience_totale": 10.0, "distance_domicile_travail": 15.0
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+)
 
 def predict(data: EmployeeData, _ = Security(verify_api_key)):
     # 1. Conversion en DataFrame
