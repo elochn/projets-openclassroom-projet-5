@@ -113,7 +113,12 @@ class EmployeeData(BaseModel):
 def root():
     return {"message": "API opérationnelle ✅"}
 
-@app.post("/predict")
+@app.post("/predict", responses={
+    401: {"description": "Not authenticated", "content": {"application/json": {"example": {"detail": "Not authenticated"}}}},
+    403: {"description": "Clé API invalide", "content": {"application/json": {"example": {"detail": "Clé API invalide"}}}},
+    500: {"description": "Internal Server Error", "content": {"application/json": {"example": {"detail": "Internal Server Error"}}}},
+})
+
 def predict(data: EmployeeData, _ = Security(verify_api_key)):
     # 1. Conversion en DataFrame
     df = pd.DataFrame([data.model_dump()]) # transformation de l'objet EmployeeData reçu par l'API en dictionnaire Python (27 champs input)
